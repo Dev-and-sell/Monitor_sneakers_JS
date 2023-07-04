@@ -5,7 +5,6 @@ const fs = require('fs');
 
 process.setMaxListeners(1000000)
 
-// Fonction pour envoyer une notification Discord via un webhook
 async function sendDiscordNotification(webhookUrl, message) {
   try {
     await axios.post(webhookUrl, { content: message });
@@ -15,27 +14,26 @@ async function sendDiscordNotification(webhookUrl, message) {
   }
 }
 
-// Fonction pour charger tous les éléments de la page
 async function loadAllElements() {
   try {
     const browser = await puppeteer.launch({ headless: 'new' });
     const page = await browser.newPage();
 
-    // Définir un User-Agent personnalisé
+
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36');
 
     await page.goto('https://www.lesitedelasneaker.com/release-dates/');
 
     while (true) {
-      // Vérifie si le bouton "Afficher plus" est présent
+     
       const loadMoreButton = await page.$('.facetwp-load-more');
       if (!loadMoreButton) {
         break;
       }
-      // Clique sur le bouton "Afficher plus"
+      
       await loadMoreButton.click();
 
-      // Attendez 10 secondes avant de continuer la boucle
+      
       await page.waitForTimeout(10000);
     }
 
@@ -48,7 +46,7 @@ async function loadAllElements() {
   }
 }
 
-// Fonction pour vérifier les nouvelles sneakers
+
 async function checkForNewSneakers() {
   try {
     const html = await loadAllElements();
@@ -77,8 +75,6 @@ async function checkForNewSneakers() {
   }
 }
 
-// Exécuter la vérification une fois au démarrage
 checkForNewSneakers();
 
-// Exécuter la vérification toutes les 5 secondes
 setInterval(checkForNewSneakers, 5000);
