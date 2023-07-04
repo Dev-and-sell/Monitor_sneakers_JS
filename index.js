@@ -3,6 +3,8 @@ const cheerio = require('cheerio');
 const config = require('./configs/config.json');
 const fs = require('fs');
 
+process.setMaxListeners(1000000)
+
 // Fonction pour envoyer une notification Discord via un webhook
 async function sendDiscordNotification(webhookUrl, message) {
   try {
@@ -18,6 +20,10 @@ async function loadAllElements() {
   try {
     const browser = await puppeteer.launch({ headless: 'new' });
     const page = await browser.newPage();
+
+    // Définir un User-Agent personnalisé
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36');
+
     await page.goto('https://www.lesitedelasneaker.com/release-dates/');
 
     while (true) {
@@ -28,7 +34,9 @@ async function loadAllElements() {
       }
       // Clique sur le bouton "Afficher plus"
       await loadMoreButton.click();
-      await page.waitForTimeout(1000);
+
+      // Attendez 10 secondes avant de continuer la boucle
+      await page.waitForTimeout(10000);
     }
 
     const html = await page.content();
@@ -36,7 +44,7 @@ async function loadAllElements() {
 
     return html;
   } catch (error) {
-    throw new Error('Erreur lors du chargement des éléments de la page :', error);
+    throw new Error( error);
   }
 }
 
@@ -72,5 +80,5 @@ async function checkForNewSneakers() {
 // Exécuter la vérification une fois au démarrage
 checkForNewSneakers();
 
-// Exécuter la vérification toutes les 1 seconde (1000 ms)
-setInterval(checkForNewSneakers, 1000);
+// Exécuter la vérification toutes les 5 secondes
+setInterval(checkForNewSneakers, 5000);
